@@ -1,5 +1,6 @@
 package com.soham.memesharing
 
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
@@ -19,12 +20,16 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 
 class MainActivity : AppCompatActivity() {
+
+    var currentImageURL: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         loadMeme()
     }
+
 
     private fun loadMeme() {
         progressBar.visibility = View.VISIBLE
@@ -35,8 +40,8 @@ class MainActivity : AppCompatActivity() {
 // Request a string response from the provided URL.
         val jsonObjectRequest = JsonObjectRequest(Request.Method.GET, url, null,
             { response ->
-                val url = response.getString("url")
-                Glide.with(this).load(url).listener(object : RequestListener<Drawable> {
+                currentImageURL = response.getString("url")
+                Glide.with(this).load(currentImageURL).listener(object : RequestListener<Drawable> {
 
                     override fun onLoadFailed(
                         e: GlideException?,
@@ -74,7 +79,15 @@ class MainActivity : AppCompatActivity() {
         queue.add(jsonObjectRequest)
     }
 
-    fun sharememe(view: View) {}
+    fun sharememe(view: View) {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(Intent.EXTRA_TEXT, "Hey, checkout this cool meme I got form Reddit $currentImageURL")
+        val choose1 = Intent.createChooser(intent, "Share this meme using The Meme app !!!")
+        startActivity(choose1)
+//        val chooser = Indent.createChooser(intent, )
+    }
+
     fun nextmeme(view: View) {
         loadMeme()
     }
